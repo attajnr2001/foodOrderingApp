@@ -98,6 +98,7 @@ function Navbar() {
         console.log(error);
       }
     };
+    findUser();
   }, [nickName]);
 
   useEffect(() => {

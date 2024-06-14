@@ -88,7 +88,7 @@ function TempOrdersDialog({
         await addDoc(collection(db, "Orders"), pickupData);
         console.log("Pickup order data saved successfully!");
 
-        // Optionally, clear tempOrders state after successful order
+  
         // setTempOrders([]);
         // setTempOrdersCount(0);
 
