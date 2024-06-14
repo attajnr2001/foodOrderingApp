@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { Box, Grid, Typography, Rating, IconButton } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
-import FoodDialog from "../mod/FoodDialog"; // Adjust the path as needed
+import FoodDialog from "../mod/FoodDialog"; 
 
 const ImageWrapper = styled("div")({
   width: "100%",
   height: "200px",
   overflow: "hidden",
-  position: "relative", // Add position relative for positioning the button
+  position: "relative", 
   borderRadius: 10,
 });
 
@@ -86,7 +86,7 @@ const FoodCard = ({ id, imageSrc, title, rating, price, description, }) => {
         title={title}
         rating={rating}
         price={price}
-        imageSrc={imageSrc} // Pass the imageSrc prop
+        imageSrc={imageSrc} 
         description={description}
         id={id}
       />

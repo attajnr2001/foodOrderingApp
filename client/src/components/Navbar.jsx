@@ -110,7 +110,6 @@ function Navbar() {
         setTempOrdersCount(querySnapshot.size);
       });
 
-      // Cleanup the subscription
       return () => unsubscribe();
     }
   }, [clientID]);

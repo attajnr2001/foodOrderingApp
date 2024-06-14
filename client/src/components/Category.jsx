@@ -3,10 +3,9 @@ import { Box, Grid, Typography, IconButton, Skeleton } from "@mui/material";
 import { ArrowForwardIos } from "@mui/icons-material";
 import FoodCard from "./FoodCard";
 import { Link } from "react-router-dom";
-import { db } from "../helpers/firebase"; // make sure the path to your firebase config is correct
+import { db } from "../helpers/firebase"; 
 import { collection, query, limit, getDocs, where } from "firebase/firestore";
 
-// Function to shuffle an array
 const shuffleArray = (array) => {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -25,7 +24,7 @@ const Category = ({ type, link, category }) => {
         const q = query(
           collection(db, "food"),
           where("category", "array-contains", category),
-          limit(120) // Fetch more than 4 to allow randomness
+          limit(120) 
         );
         const querySnapshot = await getDocs(q);
         let foodList = [];
@@ -33,10 +32,8 @@ const Category = ({ type, link, category }) => {
           foodList.push({ id: doc.id, ...doc.data() });
         });
 
-        // Shuffle the food list
         foodList = shuffleArray(foodList);
 
-        // Select the first 4 foods
         setFoods(foodList.slice(0, 4));
       } catch (error) {
         console.error("Error fetching foods:", error);

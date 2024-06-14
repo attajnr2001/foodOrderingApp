@@ -13,7 +13,7 @@ import {
   TextField,
 } from "@mui/material";
 import { ShoppingCart } from "@mui/icons-material";
-import { db } from "../helpers/firebase"; // Import the Firebase database module
+import { db } from "../helpers/firebase"; 
 import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
 import { useParams } from "react-router-dom";
 
@@ -63,7 +63,7 @@ const FoodDialog = ({
       return acc + qty * toppings[i].price;
     }, price);
 
-    // Multiply the total price by the number of packs
+    
     setTotalPrice(newTotalPrice);
   };
 
@@ -205,7 +205,7 @@ const FoodDialog = ({
                 },
               }}
               variant="contained"
-              onClick={handleAddToCart} // Add onClick handler here
+              onClick={handleAddToCart} 
             >
               Add GHC {totalPrice.toFixed(2)} To Cart
             </Button>

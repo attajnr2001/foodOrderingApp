@@ -19,6 +19,9 @@ import ShoppingCart from "@mui/icons-material/ShoppingCart";
 import DeliveryDialog from "./DeliveryDialog";
 import Alert from "@mui/material/Alert";
 import TextField from "@mui/material/TextField";
+import { db } from "../helpers/firebase"; // Ensure db is correctly imported
+import { collection, addDoc } from "firebase/firestore";
+import { useParams } from "react-router-dom";
 
 function TempOrdersDialog({
   open,
@@ -31,9 +34,11 @@ function TempOrdersDialog({
   const [orderType, setOrderType] = useState("delivery");
   const [showDeliveryDialog, setShowDeliveryDialog] = useState(false);
   const [orderQuantities, setOrderQuantities] = useState(
-    Array(tempOrders.length).fill(1) // Initialize quantities with 1 for each order
+    Array(tempOrders.length).fill(1)
   );
+
   const [totalPrice, setTotalPrice] = useState(0);
+  const { clientID } = useParams();
 
   // Update total price whenever orderQuantities or tempOrders change
   useEffect(() => {
@@ -53,20 +58,63 @@ function TempOrdersDialog({
     setOrderType(type);
   };
 
-  const handleOrder = () => {
+  const handleQuantityChange = (event, index) => {
+    const { value } = event.target;
+    const newQuantities = [...orderQuantities];
+    newQuantities[index] = parseInt(value) || 1;
+    setOrderQuantities(newQuantities);
+  };
+
+  const handleOrder = async () => {
     if (orderType === "delivery") {
       setShowDeliveryDialog(true);
     } else {
       // Handle pickup order logic
-      onOrder();
+      const timestamp = await fetchTimestamp();
+      const pickupOrders = tempOrders.map((order, index) => ({
+        ...order,
+        quantity: orderQuantities[index],
+      }));
+      const pickupData = {
+        orders: pickupOrders,
+        totalPrice: totalPrice.toFixed(2),
+        pickupTime: timestamp,
+        clientID: clientID,
+      };
+      console.log("Pickup Order Data:", pickupData);
+
+      try {
+        // Save pickupData to Firestore
+        await addDoc(collection(db, "Orders"), pickupData);
+        console.log("Pickup order data saved successfully!");
+
+        // Optionally, clear tempOrders state after successful order
+        // setTempOrders([]);
+        // setTempOrdersCount(0);
+
+        // Close the dialog
+        onClose();
+      } catch (error) {
+        console.error("Error saving pickup order data:", error.message);
+        // Handle error state or retry logic
+      }
     }
   };
 
-  const handleQuantityChange = (event, index) => {
-    const { value } = event.target;
-    const newQuantities = [...orderQuantities];
-    newQuantities[index] = parseInt(value) || 1; // Ensure it's a number, default to 1 if NaN
-    setOrderQuantities(newQuantities);
+  const fetchTimestamp = async () => {
+    try {
+      const response = await fetch(
+        "http://worldtimeapi.org/api/timezone/Africa/Accra"
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch timestamp");
+      }
+      const data = await response.json();
+      return data.datetime;
+    } catch (error) {
+      console.error("Error fetching timestamp:", error.message);
+      return null;
+    }
   };
 
   const orderTypeStyle = {
@@ -219,7 +267,7 @@ function TempOrdersDialog({
               color: "white",
               "&:hover": {
                 backgroundColor: "rgba(0, 0, 0, 0.8)",
-            },
+              },
             }}
             variant="contained"
             onClick={handleOrder}
