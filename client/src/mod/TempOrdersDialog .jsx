@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -17,7 +17,6 @@ import Button from "@mui/material/Button";
 import { motion, AnimatePresence } from "framer-motion";
 import ShoppingCart from "@mui/icons-material/ShoppingCart";
 import DeliveryDialog from "./DeliveryDialog";
-import Alert from "@mui/material/Alert";
 
 function TempOrdersDialog({
   open,
@@ -27,21 +26,8 @@ function TempOrdersDialog({
   onOrder,
 }) {
   const [expandedOrderIndex, setExpandedOrderIndex] = useState(null);
-  const [orderType, setOrderType] = useState("pickup");
+  const [orderType, setOrderType] = useState("delivery");
   const [showDeliveryDialog, setShowDeliveryDialog] = useState(false);
-  const [total, setTotal] = useState(0);
-  const [showDeliveryFeeWarning, setShowDeliveryFeeWarning] = useState(false);
-
-  useEffect(() => {
-    const initialTotal = tempOrders.reduce((acc, order) => {
-      return acc + order.totalPrice;
-    }, 0);
-
-    // Round up to two decimal places
-    const roundedTotal = Math.ceil(initialTotal * 100) / 100;
-
-    setTotal(roundedTotal);
-  }, [tempOrders]);
 
   const toggleExpand = (index) => {
     setExpandedOrderIndex(expandedOrderIndex === index ? null : index);
@@ -49,8 +35,6 @@ function TempOrdersDialog({
 
   const handleOrderTypeClick = (type) => {
     setOrderType(type);
-    // Show delivery fee warning only when delivery is selected
-    setShowDeliveryFeeWarning(type === "delivery");
   };
 
   const handleOrder = () => {
@@ -91,7 +75,7 @@ function TempOrdersDialog({
                           fontWeight="bold"
                           textTransform={"capitalize"}
                         >
-                          {order.foodName} - ${order.totalPrice.toFixed(2)}
+                          {order.foodName} - ${order.totalPrice}
                         </Typography>
                       }
                     />
@@ -130,8 +114,7 @@ function TempOrdersDialog({
                                       exit={{ opacity: 0, x: 20 }}
                                       transition={{ duration: 0.2 }}
                                     >
-                                      {topping.name} - $
-                                      {topping.price.toFixed(2)}
+                                      {topping.name} - ${topping.price}
                                     </motion.li>
                                   ))}
                                 </ul>
@@ -158,6 +141,7 @@ function TempOrdersDialog({
               ))}
             </List>
           </Paper>
+
           <div>
             <span
               style={orderTypeStyle}
@@ -176,14 +160,7 @@ function TempOrdersDialog({
               Pickup
             </span>
           </div>
-          {/* Warning message */}
-          {showDeliveryFeeWarning && (
-            <Alert severity="warning" sx={{ mt: 2 }}>
-              Delivery fee not included
-            </Alert>
-          )}
         </DialogContent>
-
         <DialogActions>
           <Button
             startIcon={<ShoppingCart />}
@@ -198,7 +175,7 @@ function TempOrdersDialog({
             variant="contained"
             onClick={handleOrder}
           >
-            ORDER GHC {total.toFixed(2)}
+            ORDER
           </Button>
         </DialogActions>
       </Dialog>
