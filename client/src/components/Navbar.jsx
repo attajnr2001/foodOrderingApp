@@ -14,6 +14,7 @@ import Badge from "@mui/material/Badge";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useParams } from "react-router-dom";
 import { db, auth } from "../helpers/firebase";
+import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import {
   collection,
   query,
@@ -23,7 +24,7 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
-import TempOrdersDialog from "../mod/TempOrdersDialog ";
+import TempOrdersDialog from "../mod/TempOrdersDialog"
 
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
@@ -34,6 +35,7 @@ function Navbar() {
   const [tempOrdersCount, setTempOrdersCount] = useState(0);
   const [tempOrders, setTempOrders] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [showNavbar, setShowNavbar] = useState(true);
   const { clientID } = useParams();
 
   const handleOpenNavMenu = (event) => {
@@ -115,11 +117,38 @@ function Navbar() {
     }
   }, [clientID]);
 
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+
+    const handleScroll = () => {
+      if (window.scrollY > lastScrollY) {
+        // Scroll down
+        setShowNavbar(false);
+      } else {
+        // Scroll up
+        setShowNavbar(true);
+      }
+      lastScrollY = window.scrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
     <div className="top">
       <AppBar
-        position="static"
-        sx={{ backgroundColor: "white", color: "#333", alignItems: "center" }}
+        position="fixed"
+        sx={{
+          backgroundColor: "white",
+          color: "#333",
+          alignItems: "center",
+          top: showNavbar ? "0" : "-64px",
+          transition: "top 0.3s",
+        }}
       >
         <Container maxWidth="xl">
           <Toolbar disableGutters>
@@ -210,7 +239,7 @@ function Navbar() {
               variant="h5"
               noWrap
               component="a"
-              href="#app-bar-with-responsive-menu"
+              href=""
               sx={{
                 display: { xs: "flex", md: "none" },
                 flexGrow: 1,
@@ -260,6 +289,11 @@ function Navbar() {
                   <Badge badgeContent={tempOrdersCount} color="primary">
                     <ShoppingCartIcon color="action" />
                   </Badge>
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="My Orders">
+                <IconButton>
+                  <PlaylistAddCheckIcon />
                 </IconButton>
               </Tooltip>
               <Menu

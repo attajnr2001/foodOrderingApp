@@ -7,6 +7,8 @@ import RootLayout from "./layouts/RootLayout";
 import Dashboard from "./pages/Dashboard";
 import { AuthContext } from "./context/AuthContext";
 import Login from "./pages/Login";
+import SampFoods from "./components/SampFoods";
+import AllCategoryFoods from "./components/AllCategoryFoods";
 
 const App = () => {
   const { currentUser } = useContext(AuthContext);
@@ -23,7 +25,10 @@ const App = () => {
             <Route path="" element={<Welcome />} />
             <Route path="login" element={<Login />} />
             <Route path="dashboard/:clientID" element={<RootLayout />}>
-              <Route index element={<Dashboard />} />
+              <Route path="" element={<Dashboard />}>
+                <Route index element={<SampFoods />} />
+                <Route path=":categoryID" element={<AllCategoryFoods />} />
+              </Route>
             </Route>
           </Routes>
         </BrowserRouter>

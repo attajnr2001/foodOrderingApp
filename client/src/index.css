@@ -165,3 +165,17 @@
   .swiper-pagination .swiper-pagination-bullet-active {
     background: var(--primary);
   }
+
+  .slide-content {
+    position: relative;
+    text-align: center;
+    cursor: pointer;
+  }
+  
+  .food-name {
+    margin-top: 1rem;
+    font-weight: bold;
+    color: #333;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+  }

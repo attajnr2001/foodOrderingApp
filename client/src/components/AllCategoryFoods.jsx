@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Box, Grid, Typography, IconButton, Skeleton } from "@mui/material";
-import { ArrowForwardIos } from "@mui/icons-material";
 import FoodCard from "./FoodCard";
-import { Link } from "react-router-dom";
 import { db } from "../helpers/firebase";
 import {
   collection,
   query,
   limit,
-  getDocs,
   where,
   onSnapshot,
+  doc,
 } from "firebase/firestore";
+import { useParams } from "react-router-dom";
 
 const shuffleArray = (array) => {
   for (let i = array.length - 1; i > 0; i--) {
@@ -21,15 +20,44 @@ const shuffleArray = (array) => {
   return array;
 };
 
-const Category = ({ type, link, category }) => {
+const AllCategoryFoods = () => {
   const [foods, setFoods] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [categoryDetails, setCategoryDetails] = useState({
+    type: "",
+    name: "",
+  });
+  const { clientID, categoryID } = useParams();
 
   useEffect(() => {
+    if (!categoryID) return;
+
+    const categoryDoc = doc(db, "category", categoryID);
+
+    const unsubscribe = onSnapshot(
+      categoryDoc,
+      (docSnapshot) => {
+        if (docSnapshot.exists()) {
+          const data = docSnapshot.data();
+          setCategoryDetails({ type: data.type, name: data.name });
+        } else {
+          console.error("No such category!");
+        }
+      },
+      (error) => {
+        console.error("Error fetching category details:", error);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [categoryID]);
+
+  useEffect(() => {
+    if (!categoryDetails.name) return;
+
     const q = query(
       collection(db, "food"),
-      where("category", "array-contains", category),
-      limit(120)
+      where("category", "array-contains", categoryDetails.name),
     );
 
     const unsubscribe = onSnapshot(
@@ -41,8 +69,7 @@ const Category = ({ type, link, category }) => {
         });
 
         foodList = shuffleArray(foodList);
-
-        setFoods(foodList.slice(0, 4));
+        setFoods(foodList);
         setLoading(false);
       },
       (error) => {
@@ -52,7 +79,7 @@ const Category = ({ type, link, category }) => {
     );
 
     return () => unsubscribe();
-  }, [category]);
+  }, [categoryDetails]);
 
   return (
     <Box sx={{ textAlign: "left", my: 3 }}>
@@ -61,13 +88,8 @@ const Category = ({ type, link, category }) => {
         style={{ display: "flex", justifyContent: "space-between" }}
       >
         <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-          {type}
+          {categoryDetails.type}
         </Typography>
-        <Link to={link}>
-          <IconButton>
-            <ArrowForwardIos />
-          </IconButton>
-        </Link>
       </div>
       <Box sx={{ my: 2 }}>
         <Grid container spacing={2}>
@@ -96,4 +118,4 @@ const Category = ({ type, link, category }) => {
   );
 };
 
-export default Category;
+export default AllCategoryFoods;
