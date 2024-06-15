@@ -105,7 +105,14 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 import { EffectCoverflow, Navigation, Pagination } from "swiper/modules";
 import "../styles/slideshow.css";
-import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  orderBy,
+  limit,
+  getDocs,
+  onSnapshot,
+} from "firebase/firestore";
 import { db } from "../helpers/firebase";
 import FoodDialog from "../mod/FoodDialog";
 
@@ -115,22 +122,31 @@ const Slideshow = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
-    const fetchTopFoods = async () => {
-      try {
-        const foodsCollection = collection(db, "food");
-        const q = query(foodsCollection, orderBy("count", "desc"), limit(10));
-        const querySnapshot = await getDocs(q);
-        const topFoodsData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setTopFoods(topFoodsData);
-      } catch (error) {
-        console.error("Error fetching top foods:", error);
-      }
+    const fetchTopFoods = () => {
+      const foodsCollection = collection(db, "food");
+      const q = query(foodsCollection, orderBy("count", "desc"), limit(10));
+
+      const unsubscribe = onSnapshot(
+        q,
+        (querySnapshot) => {
+          const topFoodsData = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setTopFoods(topFoodsData);
+        },
+        (error) => {
+          console.error("Error fetching top foods:", error);
+        }
+      );
+
+      return unsubscribe; // Return the unsubscribe function to clean up the listener
     };
 
-    fetchTopFoods();
+    const unsubscribe = fetchTopFoods();
+
+    // Clean up the listener on component unmount
+    return () => unsubscribe();
   }, []);
 
   const handleImageClick = (food) => {

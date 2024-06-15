@@ -188,6 +188,7 @@ function TempOrdersDialog({ open, onClose, tempOrders, onRemoveOrder }) {
   };
 
   const handleOrder = async () => {
+    const pickupDateTime = `${pickupDate}T${pickupTime}`;
     if (orderType === "delivery") {
       const deliveryOrders = tempOrders.map((order, index) => ({
         ...order,
@@ -205,6 +206,7 @@ function TempOrdersDialog({ open, onClose, tempOrders, onRemoveOrder }) {
         location: selectedLocation,
         clientId: clientID,
         orderType: "delivery",
+        orderTime: pickupDateTime,
         deliveryGuy: randomDeliveryGuy,
       };
       console.log("Delivery Order Data:", deliveryData);
@@ -267,7 +269,7 @@ function TempOrdersDialog({ open, onClose, tempOrders, onRemoveOrder }) {
       const pickupData = {
         orders: pickupOrders,
         totalPrice: totalPrice.toFixed(2),
-        pickupTime: pickupDateTime,
+        orderTime: pickupDateTime,
         clientID: clientID,
         otherInformation: otherInformation,
         orderType: "pickup",
