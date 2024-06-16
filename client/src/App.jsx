@@ -9,6 +9,7 @@ import { AuthContext } from "./context/AuthContext";
 import Login from "./pages/Login";
 import SampFoods from "./components/SampFoods";
 import AllCategoryFoods from "./components/AllCategoryFoods";
+import Orders from "./components/Orders";
 
 const App = () => {
   const { currentUser } = useContext(AuthContext);
@@ -29,6 +30,7 @@ const App = () => {
                 <Route index element={<SampFoods />} />
                 <Route path=":categoryID" element={<AllCategoryFoods />} />
               </Route>
+                <Route path="orders" element={<Orders />} />
             </Route>
           </Routes>
         </BrowserRouter>

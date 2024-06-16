@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Box, Grid, Typography, IconButton, Skeleton } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Typography,
+  TextField,
+  Skeleton,
+  InputAdornment,
+} from "@mui/material";
+import { Search } from "@mui/icons-material";
 import FoodCard from "./FoodCard";
 import { db } from "../helpers/firebase";
 import {
@@ -28,6 +36,11 @@ const AllCategoryFoods = () => {
     name: "",
   });
   const { clientID, categoryID } = useParams();
+  const [searchValue, setSearchValue] = useState("");
+
+  const handleSearchChange = (event) => {
+    setSearchValue(event.target.value);
+  };
 
   useEffect(() => {
     if (!categoryID) return;
@@ -57,7 +70,7 @@ const AllCategoryFoods = () => {
 
     const q = query(
       collection(db, "food"),
-      where("category", "array-contains", categoryDetails.name),
+      where("category", "array-contains", categoryDetails.name)
     );
 
     const unsubscribe = onSnapshot(
@@ -81,8 +94,27 @@ const AllCategoryFoods = () => {
     return () => unsubscribe();
   }, [categoryDetails]);
 
+  const filteredFoods = foods.filter(
+    (food) =>
+      food.name.toLowerCase().includes(searchValue.toLowerCase()) &&
+      food.category.includes(categoryDetails.name)
+  );
+
   return (
     <Box sx={{ textAlign: "left", my: 3 }}>
+      <TextField
+        sx={{ mb: 2, p: 0, width: "100%", fontSize: "1em", fontWeight: "bold" }}
+        placeholder="Search Foods..."
+        value={searchValue}
+        onChange={handleSearchChange}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <Search />
+            </InputAdornment>
+          ),
+        }}
+      />
       <div
         className="head"
         style={{ display: "flex", justifyContent: "space-between" }}
@@ -101,7 +133,7 @@ const AllCategoryFoods = () => {
                   <Skeleton width="40%" />
                 </Grid>
               ))
-            : foods.map((food) => (
+            : filteredFoods.map((food) => (
                 <FoodCard
                   key={food.id}
                   id={food.id}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -10,9 +10,10 @@ import Container from "@mui/material/Container";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import LocalDiningIcon from "@mui/icons-material/LocalDining";
+import LogoutIcon from "@mui/icons-material/Logout";
 import Badge from "@mui/material/Badge";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { db, auth } from "../helpers/firebase";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import {
@@ -24,9 +25,10 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
-import TempOrdersDialog from "../mod/TempOrdersDialog"
-
+import TempOrdersDialog from "../mod/TempOrdersDialog";
+import { signOut } from "firebase/auth";
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
+import { AuthContext } from "../context/AuthContext";
 
 function Navbar() {
   const [anchorElNav, setAnchorElNav] = useState(null);
@@ -37,6 +39,8 @@ function Navbar() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [showNavbar, setShowNavbar] = useState(true);
   const { clientID } = useParams();
+  const { currentUser, dispatch } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -138,6 +142,16 @@ function Navbar() {
     };
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      dispatch({ type: "LOGOUT" });
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
   return (
     <div className="top">
       <AppBar
@@ -171,7 +185,7 @@ function Navbar() {
                 textDecoration: "none",
               }}
             >
-              ELYSIAN EATS
+              ACE EATS
             </Typography>
 
             <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
@@ -248,7 +262,7 @@ function Navbar() {
                 textDecoration: "none",
               }}
             >
-              ELYSIAN EATS
+              ACE EATS
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
               <Box
@@ -285,15 +299,24 @@ function Navbar() {
 
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open Cart">
-                <IconButton onClick={handleOpenDialog} sx={{ p: 0 }}>
+                <IconButton
+                  onClick={handleOpenDialog}
+                  sx={{ p: 0 }}
+                  size="small"
+                >
                   <Badge badgeContent={tempOrdersCount} color="primary">
                     <ShoppingCartIcon color="action" />
                   </Badge>
                 </IconButton>
               </Tooltip>
               <Tooltip title="My Orders">
-                <IconButton>
+                <IconButton component={Link} to={"orders"}>
                   <PlaylistAddCheckIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Logout">
+                <IconButton size="small">
+                  <LogoutIcon onClick={handleLogout} />
                 </IconButton>
               </Tooltip>
               <Menu

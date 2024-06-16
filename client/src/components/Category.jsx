@@ -3,15 +3,6 @@ import { Box, Grid, Typography, IconButton, Skeleton } from "@mui/material";
 import { ArrowForwardIos } from "@mui/icons-material";
 import FoodCard from "./FoodCard";
 import { Link } from "react-router-dom";
-import { db } from "../helpers/firebase";
-import {
-  collection,
-  query,
-  limit,
-  getDocs,
-  where,
-  onSnapshot,
-} from "firebase/firestore";
 
 const shuffleArray = (array) => {
   for (let i = array.length - 1; i > 0; i--) {
@@ -21,38 +12,18 @@ const shuffleArray = (array) => {
   return array;
 };
 
-const Category = ({ type, link, category }) => {
-  const [foods, setFoods] = useState([]);
+const Category = ({ type, link, category, foods }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const q = query(
-      collection(db, "food"),
-      where("category", "array-contains", category),
-      limit(120)
-    );
+    if (foods.length > 0) {
+      setLoading(false);
+    }
+  }, [foods]);
 
-    const unsubscribe = onSnapshot(
-      q,
-      (querySnapshot) => {
-        let foodList = [];
-        querySnapshot.forEach((doc) => {
-          foodList.push({ id: doc.id, ...doc.data() });
-        });
-
-        foodList = shuffleArray(foodList);
-
-        setFoods(foodList.slice(0, 4));
-        setLoading(false);
-      },
-      (error) => {
-        console.error("Error fetching foods:", error);
-        setLoading(false);
-      }
-    );
-
-    return () => unsubscribe();
-  }, [category]);
+  const filteredFoods = foods.filter((food) =>
+    food.category.includes(category)
+  );
 
   return (
     <Box sx={{ textAlign: "left", my: 3 }}>
@@ -69,29 +40,37 @@ const Category = ({ type, link, category }) => {
           </IconButton>
         </Link>
       </div>
-      <Box sx={{ my: 2 }}>
-        <Grid container spacing={2}>
-          {loading
-            ? [1, 2, 3, 4].map((index) => (
-                <Grid item xs={12} sm={6} md={3} key={index}>
-                  <Skeleton variant="rectangular" width="100%" height={200} />
-                  <Skeleton width="60%" />
-                  <Skeleton width="40%" />
-                </Grid>
-              ))
-            : foods.map((food) => (
-                <FoodCard
-                  key={food.id}
-                  id={food.id}
-                  imageSrc={food.image}
-                  title={food.name}
-                  rating={food.ratings}
-                  price={food.price}
-                  description={food.description}
-                />
-              ))}
-        </Grid>
-      </Box>
+      {filteredFoods.length > 0 ? (
+        <Box sx={{ my: 2 }}>
+          <Grid container spacing={2}>
+            {loading
+              ? [1, 2, 3, 4].map((index) => (
+                  <Grid item xs={12} sm={6} md={3} key={index}>
+                    <Skeleton variant="rectangular" width="100%" height={200} />
+                    <Skeleton width="60%" />
+                    <Skeleton width="40%" />
+                  </Grid>
+                ))
+              : filteredFoods
+                  .slice(0, 4)
+                  .map((food) => (
+                    <FoodCard
+                      key={food.id}
+                      id={food.id}
+                      imageSrc={food.image}
+                      title={food.name}
+                      rating={food.ratings}
+                      price={food.price}
+                      description={food.description}
+                    />
+                  ))}
+          </Grid>
+        </Box>
+      ) : (
+        <Typography variant="body1">
+          No matching foods found for this category.
+        </Typography>
+      )}
     </Box>
   );
 };
