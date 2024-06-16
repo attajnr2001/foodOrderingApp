@@ -270,7 +270,7 @@ function TempOrdersDialog({ open, onClose, tempOrders, onRemoveOrder }) {
         orders: pickupOrders,
         totalPrice: totalPrice.toFixed(2),
         orderTime: pickupDateTime,
-        clientID: clientID,
+        clientId: clientID,
         otherInformation: otherInformation,
         orderType: "pickup",
         token,
@@ -298,7 +298,7 @@ function TempOrdersDialog({ open, onClose, tempOrders, onRemoveOrder }) {
         );
 
         for (const order of pickupOrders) {
-          const foodRef = doc(db, "foods", order.foodId);
+          const foodRef = doc(db, "food", order.foodId);
           const foodDoc = await getDoc(foodRef);
 
           if (foodDoc.exists()) {
