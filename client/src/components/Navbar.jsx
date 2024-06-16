@@ -10,7 +10,6 @@ import Container from "@mui/material/Container";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import LocalDiningIcon from "@mui/icons-material/LocalDining";
-import LogoutIcon from "@mui/icons-material/Logout";
 import Badge from "@mui/material/Badge";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useParams, useNavigate, Link } from "react-router-dom";
@@ -27,8 +26,10 @@ import {
 } from "firebase/firestore";
 import TempOrdersDialog from "../mod/TempOrdersDialog";
 import { signOut } from "firebase/auth";
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
 import { AuthContext } from "../context/AuthContext";
+import Avatar from "@mui/material/Avatar";
+
+const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 function Navbar() {
   const [anchorElNav, setAnchorElNav] = useState(null);
@@ -152,6 +153,16 @@ function Navbar() {
     }
   };
 
+  const handleMenuItemClick = (setting) => {
+    if (setting === "Logout") {
+      handleLogout();
+    } else {
+      // Handle other settings like Profile, Account, Dashboard
+      console.log(setting);
+    }
+    handleCloseUserMenu();
+  };
+
   return (
     <div className="top">
       <AppBar
@@ -185,7 +196,7 @@ function Navbar() {
                 textDecoration: "none",
               }}
             >
-              ACE EATS
+              DRACE
             </Typography>
 
             <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
@@ -262,7 +273,7 @@ function Navbar() {
                 textDecoration: "none",
               }}
             >
-              ACE EATS
+              DRACE
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
               <Box
@@ -314,9 +325,12 @@ function Navbar() {
                   <PlaylistAddCheckIcon />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Logout">
-                <IconButton size="small">
-                  <LogoutIcon onClick={handleLogout} />
+              <Tooltip title="Account settings">
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar
+                    alt={nickName}
+                    sx={{ width: 27, height: 27, bgcolor: "#6439ff" }}
+                  >{nickName.charAt(0).toUpperCase()}</Avatar>
                 </IconButton>
               </Tooltip>
               <Menu
@@ -336,7 +350,10 @@ function Navbar() {
                 onClose={handleCloseUserMenu}
               >
                 {settings.map((setting) => (
-                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                  <MenuItem
+                    key={setting}
+                    onClick={() => handleMenuItemClick(setting)}
+                  >
                     <Typography textAlign="center">{setting}</Typography>
                   </MenuItem>
                 ))}
