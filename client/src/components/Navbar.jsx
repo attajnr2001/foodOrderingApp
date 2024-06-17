@@ -29,7 +29,7 @@ import { signOut } from "firebase/auth";
 import { AuthContext } from "../context/AuthContext";
 import Avatar from "@mui/material/Avatar";
 
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+const settings = ["Account", "Logout"];
 
 function Navbar() {
   const [anchorElNav, setAnchorElNav] = useState(null);
@@ -186,8 +186,8 @@ function Navbar() {
             <Typography
               variant="h6"
               noWrap
-              component="a"
-              href="#app-bar-with-responsive-menu"
+              component={Link}
+              to={`/dashboard/${clientID}`}
               sx={{
                 mr: 2,
                 display: { xs: "none", md: "flex" },
@@ -263,8 +263,8 @@ function Navbar() {
             <Typography
               variant="h5"
               noWrap
-              component="a"
-              href=""
+              component={Link}
+              to={`/dashboard/${clientID}`}
               sx={{
                 display: { xs: "flex", md: "none" },
                 flexGrow: 1,
@@ -330,7 +330,9 @@ function Navbar() {
                   <Avatar
                     alt={nickName}
                     sx={{ width: 27, height: 27, bgcolor: "#6439ff" }}
-                  >{nickName.charAt(0).toUpperCase()}</Avatar>
+                  >
+                    {nickName.charAt(0).toUpperCase()}
+                  </Avatar>
                 </IconButton>
               </Tooltip>
               <Menu

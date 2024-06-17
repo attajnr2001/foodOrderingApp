@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { auth, db } from "../helpers/firebase";
+import { auth } from "../helpers/firebase";
 import { AuthContext } from "../context/AuthContext";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import Container from "@mui/material/Container";
@@ -11,10 +11,10 @@ import {
   Snackbar,
   IconButton,
   Alert,
+  CircularProgress,
 } from "@mui/material";
 import { Visibility, VisibilityOff, Person } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import Grid from "@mui/material/Grid";
 
 const Login = () => {
@@ -48,7 +48,7 @@ const Login = () => {
       navigate(`/dashboard/${user.uid}`);
     } catch (error) {
       console.error("Error signing in:", error);
-      setError(error.message);
+      setError("Failed to sign in. Please check your email and password.");
     } finally {
       setLoading(false);
     }
@@ -119,15 +119,17 @@ const Login = () => {
             }}
           />
         </Grid>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleLogin}
-          sx={{ marginBottom: "10px" }}
-          disabled={loading}
-        >
-          {loading ? "Logging In..." : "Login"}
-        </Button>
+        <Grid item>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleLogin}
+            sx={{ marginBottom: "10px" }}
+            disabled={loading}
+          >
+            {loading ? <CircularProgress size={24} /> : "Login"}
+          </Button>
+        </Grid>
         <Snackbar
           open={!!error}
           autoHideDuration={6000}

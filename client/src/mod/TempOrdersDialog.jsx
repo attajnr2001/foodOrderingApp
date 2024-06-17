@@ -177,6 +177,17 @@ function TempOrdersDialog({ open, onClose, tempOrders, onRemoveOrder }) {
   };
 
   const handleOrderTypeClick = (type) => {
+    if (type === "pickup") {
+      // If changing to pickup, reset the selectedLocation and recalculate the totalPrice without the location price
+      setSelectedLocation(null);
+      const newTotalPrice = tempOrders.reduce((total, order, index) => {
+        const quantity = orderQuantities[index];
+        return total + order.totalPrice * quantity;
+      }, 0);
+      setTotalPrice(newTotalPrice);
+    } else {
+      // If changing to delivery, do nothing
+    }
     setOrderType(type);
   };
 

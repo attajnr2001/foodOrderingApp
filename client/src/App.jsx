@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./helpers/Theme";
 import Welcome from "./pages/Welcome";
@@ -19,23 +19,28 @@ const App = () => {
   };
 
   return (
-    <>
-      <ThemeProvider theme={theme}>
-        <BrowserRouter>
-          <Routes>
-            <Route path="" element={<Welcome />} />
-            <Route path="login" element={<Login />} />
-            <Route path="dashboard/:clientID" element={<RootLayout />}>
-              <Route path="" element={<Dashboard />}>
-                <Route index element={<SampFoods />} />
-                <Route path=":categoryID" element={<AllCategoryFoods />} />
-              </Route>
-                <Route path="orders" element={<Orders />} />
+    <ThemeProvider theme={theme}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Welcome />} />
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/dashboard/:clientID"
+            element={
+              <RequireAuth>
+                <RootLayout />
+              </RequireAuth>
+            }
+          >
+            <Route path="" element={<Dashboard />}>
+              <Route index element={<SampFoods />} />
+              <Route path=":categoryID" element={<AllCategoryFoods />} />
             </Route>
-          </Routes>
-        </BrowserRouter>
-      </ThemeProvider>
-    </>
+            <Route path="orders" element={<Orders />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 };
 
